@@ -35,7 +35,7 @@ export const signup=async(req,res)=>{
         })
 
         let token=await genToken(user._id);
-        req.cookie("token",token,{
+        res.cookie("token",token,{
             httpOnly:true,
             secure:false,
             sameSite:"Strict",
@@ -61,8 +61,8 @@ export const signup=async(req,res)=>{
 export const login=async(req,res)=>{
     try {
         const {email,password}=req.body;
-        const existingUser=await User.findOne({email});
-        if(!existingUser){
+        const user=await User.findOne({email});
+        if(!user){
             return res.status(400).json({
                 success:false,
                 message:"User not found"
@@ -77,7 +77,7 @@ export const login=async(req,res)=>{
         }
 
         let token=await genToken(user._id);
-        req.cookie("token",token,{
+        res.cookie("token",token,{
             httpOnly:true,
             secure:false,
             sameSite:"Strict",
@@ -86,10 +86,11 @@ export const login=async(req,res)=>{
 
         return res.status(201).json({
             success:true,
-            message:"User registered successfully",
+            message:"User login successfully",
             user
         })
     } catch (error) {
+
         return res.status(500).json({
             success:true,
             message:`Internal Server Error: ${error}`,
