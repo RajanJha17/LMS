@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import logo from '../assets/logo.jpg'
 import google from '../assets/google.jpg'
 import { IoEyeOutline } from 'react-icons/io5'
@@ -85,6 +86,14 @@ const SignUp = () => {
             </button>
           </div>
 
+          <div className='w-full flex justify-center'>
+            <p className='text-[#999797] text-sm'>
+              Already have an account?{' '}
+              <Link to="/login" className='text-black font-semibold hover:underline'>
+                Login here
+              </Link>
+            </p>
+          </div>
 
         </div>
 
