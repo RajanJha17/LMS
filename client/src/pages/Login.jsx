@@ -1,15 +1,47 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import logo from '../assets/logo.jpg'
 import google from '../assets/google.jpg'
 import { IoEyeOutline } from 'react-icons/io5'
 import { IoEye } from 'react-icons/io5'
+import axios from 'axios'
+import { ClipLoader } from 'react-spinners'
+import { toast } from 'react-toastify'
+import { serverUrl } from '../App'
 
 const Login = () => {
   const [show, setShow] = useState(false)
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const navigate=useNavigate()
+  const [loading,setLoading]=useState(false)
+
+  const handleSignIn = async () => {
+    setLoading(true)
+    try {
+      const result=await axios.post(serverUrl + "/api/auth/login", {
+        email,
+        password,
+      },{withCredentials:true})
+      console.log(result.data)
+      setLoading(false)
+      navigate("/")
+      toast.done("Login successful")
+
+    } catch (error) {
+      console.log(error)
+      setLoading(false)
+
+      toast.error(error?.response?.data?.message)
+      
+    }
+
+  }
   return (
     <div className='bg-[#dddbdb] w-[100vw] h-[100vh] flex items-center justify-center'>
-      <form className='w-[90%] md:w-200 h-150 bg-[white] shadow-xl rounded-2xl flex'>
+      <form onSubmit={(e)=>e.preventDefault()} className='w-[90%] md:w-200 h-150 bg-[white] shadow-xl rounded-2xl flex'>
         <div className='md:w-[50%] w-[100%] h-[100%] flex flex-col items-start justify-center gap-3 px-8'>
           <div className='w-full text-center'>
             <h1 className='font-semibold text-[black] text-2xl'>Welcome back</h1>
@@ -26,6 +58,7 @@ const Login = () => {
               id='email'
               className='border w-[80%] h-[35px] border-[#e7e6e6] text-[15px] px-[12px]'
               placeholder='Your email'
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -37,6 +70,7 @@ const Login = () => {
       id='password'
       className='flex-1 h-full outline-none text-[15px] border-none bg-transparent'
       placeholder='Your password'
+      onChange={(e) => setPassword(e.target.value)}
     />
     {show ? (
       <IoEye
@@ -68,8 +102,8 @@ const Login = () => {
 
           
 <div className='w-full'>
-  <button className='w-[60%] h-[40px] mx-auto  bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]'>
-    Login
+  <button onClick={handleSignIn} disabled={loading} className='w-[60%] h-[40px] mx-auto  bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]'>
+  {loading ? <ClipLoader size={30} color='white' />: "Login"}
   </button>
 </div>
 
