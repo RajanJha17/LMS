@@ -1,15 +1,49 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import logo from '../assets/logo.jpg'
 import google from '../assets/google.jpg'
 import { IoEyeOutline } from 'react-icons/io5'
 import { IoEye } from 'react-icons/io5'
+import axios from 'axios'
+import { serverUrl } from '../App'
+import { toast } from 'react-toastify'
+import {ClipLoader} from 'react-spinners'
 
 const SignUp = () => {
   const [show, setShow] = useState(false)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [role, setRole] = useState('student')
+  const navigate=useNavigate()
+  const [loading,setLoading]=useState(false)
+
+  const handleSignUp = async () => {
+    setLoading(true)
+    try {
+      const result=await axios.post(serverUrl + "/api/auth/signup", {
+        name,
+        email,
+        password,
+        role
+      },{withCredentials:true})
+      console.log(result.data)
+      setLoading(false)
+      navigate("/")
+      toast.done("Sign up successful")
+
+    } catch (error) {
+      console.log(error)
+      setLoading(false)
+
+      toast.error(error.response.data.message)
+      
+    }
+
+  }
   return (
     <div className='bg-[#dddbdb] w-[100vw] h-[100vh] flex items-center justify-center'>
-      <form className='w-[90%] md:w-200 h-150 bg-[white] shadow-xl rounded-2xl flex'>
+      <form onSubmit={(e)=>e.preventDefault()} className='w-[90%] md:w-200 h-150 bg-[white] shadow-xl rounded-2xl flex'>
         <div className='md:w-[50%] w-[100%] h-[100%] flex flex-col items-start justify-center gap-3 px-8'>
           <div className='w-full text-center'>
             <h1 className='font-semibold text-[black] text-2xl'>Let's get started</h1>
@@ -24,6 +58,8 @@ const SignUp = () => {
               id='name'
               className='border w-[80%] h-[35px] border-[#e7e6e6] text-[15px] px-[12px]'
               placeholder='Your name'
+              onChange={(e) => setName(e.target.value)}
+              value={name}
             />
           </div>
 
@@ -34,41 +70,56 @@ const SignUp = () => {
               id='email'
               className='border w-[80%] h-[35px] border-[#e7e6e6] text-[15px] px-[12px]'
               placeholder='Your email'
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
             />
           </div>
 
           <div className='flex flex-col gap-1 w-full items-start justify-center'>
-  <label className='font-semibold' htmlFor="password">Password</label>
-  <div className="w-[80%] flex items-center border border-[#e7e6e6] bg-white h-[35px] rounded-sm px-[12px]">
-    <input
-      type={show ? "text" : "password"}
-      id='password'
-      className='flex-1 h-full outline-none text-[15px] border-none bg-transparent'
-      placeholder='Your password'
-    />
-    {show ? (
-      <IoEye
-        className='w-[18px] h-[18px] cursor-pointer text-gray-600'
-        onClick={() => setShow(false)}
-      />
-    ) : (
-      <IoEyeOutline
-        className='w-[18px] h-[18px] cursor-pointer text-gray-600'
-        onClick={() => setShow(true)}
-      />
-    )}
-  </div>
-</div>
+            <label className='font-semibold' htmlFor="password">Password</label>
+            <div className="w-[80%] flex items-center border border-[#e7e6e6] bg-white h-[35px] rounded-sm px-[12px]">
+              <input
+                type={show ? "text" : "password"}
+                id='password'
+                className='flex-1 h-full outline-none text-[15px] border-none bg-transparent'
+                placeholder='Your password'
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+              />
+              {show ? (
+                <IoEye
+                  className='w-[18px] h-[18px] cursor-pointer text-gray-600'
+                  onClick={() => setShow(false)}
+                />
+              ) : (
+                <IoEyeOutline
+                  className='w-[18px] h-[18px] cursor-pointer text-gray-600'
+                  onClick={() => setShow(true)}
+                />
+              )}
+            </div>
+          </div>
 
 
 
 
           <div className='flex w-full items-center justify-center gap-4'>
-            <span className='px-[10px] py-[5px] border-[1px] rounded-xl cursor-pointer border-[#e7e6e6] hover:border-black'>Student</span>
-            <span className='px-[10px] py-[5px] border-[1px] rounded-xl cursor-pointer border-[#e7e6e6] hover:border-black'>Educator</span>
+            <span
+              className={`px-[10px] py-[5px] border-[1px] rounded-xl cursor-pointer border-[#e7e6e6] hover:border-black ${role === 'student' ? 'bg-black text-white' : ''}`}
+              onClick={() => setRole("student")}
+            >
+              Student
+            </span>
+            <span
+            
+              className={`px-[10px] py-[5px] border-[1px] rounded-xl cursor-pointer border-[#e7e6e6] hover:border-black ${role === 'educator' ? 'bg-black text-white' : ''}`}
+              onClick={() => setRole("educator")}
+            >
+              Educator
+            </span>
           </div>
           <div className='w-full flex justify-center'>
-            <button className='w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]'>Sign Up</button>
+            <button onClick={handleSignUp} disabled={loading} className='w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]'>{loading ? <ClipLoader size={30} color='white' />: "Sign Up"}</button>
           </div>
 
           <div className='w-full flex justify-center'>
